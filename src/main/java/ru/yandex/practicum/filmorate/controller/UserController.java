@@ -33,9 +33,7 @@ public class UserController extends BaseController<User> {
 
     @Override
     public void validate(User data) {
-        if (data.getName() == null) {
-            data.setName(data.getLogin());
-        } else if (data.getName().isBlank()) {
+        if (data.getName() == null || data.getName().isBlank()) {
             data.setName(data.getLogin());
         }
     }
