@@ -15,7 +15,7 @@ import java.util.List;
 public class FilmController extends BaseController<Film> {
 
     //29 декабря 1895 года
-    private final static LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private final LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
