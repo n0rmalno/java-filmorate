@@ -26,8 +26,8 @@ public class UserController extends BaseController<User> {
     }
 
     @GetMapping
-    public List<User> getAll(@Valid @RequestBody User user) {
-        log.info("Getting all user {}", user);
+    public List<User> getAll() {
+        log.info("Getting all");
         return super.getAll();
     }
 

@@ -28,8 +28,8 @@ public class FilmController extends BaseController<Film> {
     }
 
     @GetMapping
-    public List<Film> getAll(@Valid @RequestBody Film film) {
-        log.info("Getting all film {}", film);
+    public List<Film> getAll() {
+        log.info("Getting all films");
         return super.getAll();
     }
 
