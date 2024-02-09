@@ -27,7 +27,7 @@ public class UserController extends BaseController<User> {
 
     @GetMapping
     public List<User> getAll() {
-        log.info("Getting all");
+        log.info("Getting all User");
         return super.getAll();
     }
 

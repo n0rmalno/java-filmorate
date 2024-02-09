@@ -22,7 +22,6 @@ public class User extends BaseUnit {
     @NotNull
     private String login;
 
-    @NotNull
     private String name;
 
     @NotNull
