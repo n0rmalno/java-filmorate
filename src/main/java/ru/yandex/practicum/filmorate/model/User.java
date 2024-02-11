@@ -18,7 +18,7 @@ public class User extends BaseUnit {
     @NotEmpty
     private String email;
 
-    @Pattern(regexp="^\\S*$", message="Строка не должна содержать пробел")
+    @Pattern(regexp = "^\\S*$", message = "Строка не должна содержать пробел")
     private String login;
 
     private String name;
