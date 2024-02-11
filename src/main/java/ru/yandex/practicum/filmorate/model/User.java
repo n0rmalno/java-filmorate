@@ -18,13 +18,11 @@ public class User extends BaseUnit {
     @NotEmpty
     private String email;
 
-    @NotBlank
-    @NotNull
+    @Pattern(regexp="^\\S*$", message="Строка не должна содержать пробел")
     private String login;
 
     private String name;
 
-    @NotNull
     @PastOrPresent
     private LocalDate birthday;
 }

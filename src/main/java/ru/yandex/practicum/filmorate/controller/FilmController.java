@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.FilmorateValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -36,7 +37,7 @@ public class FilmController extends BaseController<Film> {
     @Override
     public void validate(Film data) {
         if (data.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new FilmorateValidationException("Film release date is invalid");
+            throw new FilmorateValidationException(HttpStatus.BAD_REQUEST, "Film release date is invalid");
         }
     }
 }

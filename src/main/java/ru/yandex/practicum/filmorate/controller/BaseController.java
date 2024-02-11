@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import org.springframework.http.HttpStatus;
 import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.BaseUnit;
 
@@ -22,7 +23,7 @@ public abstract class BaseController<T extends BaseUnit> {
 
     public T update(T data) {
         if (!storage.containsKey(data.getId())) {
-            throw new DataNotFoundException(String.format("Data %s not found", data));
+            throw new DataNotFoundException(HttpStatus.BAD_REQUEST, String.format("Data %s not found", data));
         }
         validate(data);
         storage.put(data.getId(), data);
