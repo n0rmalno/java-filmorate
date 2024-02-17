@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 public class FilmController extends BaseController<Film> {
-    private final LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
@@ -37,7 +36,7 @@ public class FilmController extends BaseController<Film> {
 
     @Override
     public void validate(Film data) {
-        if (data.getReleaseDate().isBefore(START_RELEASE_DATE)) {
+        if (data.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new FilmorateValidationException(HttpStatus.BAD_REQUEST, "Film release date is invalid");
         }
     }
