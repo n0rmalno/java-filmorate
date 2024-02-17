@@ -1,12 +1,36 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.time.LocalDate;
 
 /**
  * Film.
  */
-@Getter
-@Setter
-public class Film {
+@Data
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@AllArgsConstructor
+public class Film extends BaseUnit {
+
+    @NotBlank
+    private String name;
+
+    @Size(min = 1, max = 200, message = "Не корректная длинна строки min 1, max 200")
+    private String description;
+
+    @NotNull
+    private LocalDate releaseDate;
+
+    @NotNull
+    @Min(value = 1, message = "Продолжительность не меньше 1")
+    private int duration;
 }
