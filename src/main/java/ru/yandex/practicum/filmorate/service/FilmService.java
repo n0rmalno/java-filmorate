@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class FilmService {
     FilmStorage filmStorage;
     UserStorage userStorage;
-    LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
