@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.FilmRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,20 +14,18 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class InMemoryFilmStorage implements FilmStorage {
+public class InMemoryFilmRepository implements FilmRepository {
     private int generatedId = 0;
     private final Map<Integer, Film> storage = new HashMap<>();
 
     @Override
-    public List<Film> getFilm() {
+    public List<Film> getFilms() { //тесты пройдены
         return new ArrayList<>(storage.values());
     }
 
     @Override
-    public void createFilm(Film film) {
-        if (film.getId() == null || film.getId() == 0) {
-            film.setId(++generatedId);
-        }
+    public void createFilm(Film film) { //тесты пройдены
+        film.setId(++generatedId);
         storage.put(film.getId(), film);
         log.info("Фильм добавлен");
     }
@@ -40,16 +38,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         } else {
             throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Такого id нет в фильмах");
         }
-
     }
 
     @Override
-    public Film findByIdFilm(Integer id) {
-        Film film = storage.get(id);
-        if (film == null) {
-            throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Not found");
+    public Film findByIdFilm(Integer id) throws DataNotFoundException {  //тесты пройдены
+        if (!storage.containsKey(id)) {
+            throw new DataNotFoundException(HttpStatus.NOT_FOUND, "ID не может быть null");
         }
-        return film;
+        return storage.get(id);
     }
 
     @Override

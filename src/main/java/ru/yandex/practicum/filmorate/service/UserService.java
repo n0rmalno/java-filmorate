@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.UserRepository;
 
 import java.util.*;
 
@@ -15,40 +15,36 @@ import java.util.*;
 @Slf4j
 @Validated
 public class UserService {
-    UserStorage userStorage;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public User createUser(User user) {
         validate(user);
-        userStorage.createUser(user);
+        userRepository.createUser(user);
         return user;
     }
 
     public User updateUser(User user) {
         validate(user);
-        userStorage.updateUser(user);
+        userRepository.updateUser(user);
         return user;
     }
 
-    public List<User> getUser() {
-        return userStorage.getUsers();
+    public List<User> getUsers() {
+        return userRepository.getUsers();
     }
 
     public User findByIdUser(Long id) {
-        return userStorage.findByIdUser(id);
+        return userRepository.findByIdUser(id);
     }
 
-    public void addFriend(Long id, Long friendId) {
-        User user = userStorage.findByIdUser(id);
-        User userFriend = userStorage.findByIdUser(friendId);
-
-        if (user == null || userFriend == null) {
-            throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Not found");
-        }
+    public void addFriend(Long id, Long friendId) { //тесты пройдены
+        User user = userRepository.findByIdUser(id);
+        User userFriend = userRepository.findByIdUser(friendId);
 
         if (userFriend != null) {
             if (userFriend.getFriendsId() == null) {
@@ -58,7 +54,7 @@ public class UserService {
             friendsUser.add(id);
             log.info("Добавили для Юзера по id " + friendId + " друга по id " + id);
             userFriend.setFriendsId(friendsUser);
-            userStorage.saveUser(userFriend); // Сохраняем обновленные данные userFriend
+            userRepository.saveUser(userFriend); // Сохраняем обновленные данные userFriend
         }
 
         if (user != null) {
@@ -69,12 +65,12 @@ public class UserService {
             friends.add(friendId);
             log.info("Добавили для Юзера по id " + id + " друга по id " + friendId);
             user.setFriendsId(friends);
-            userStorage.saveUser(user); // Сохраняем обновленные данные user
+            userRepository.saveUser(user); // Сохраняем обновленные данные user
         }
     }
 
     public void deleteFriend(Long id, Long friendId) {
-        User user = userStorage.findByIdUser(id);
+        User user = userRepository.findByIdUser(id);
 
         if (user == null) {
             throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Not found");
@@ -89,17 +85,13 @@ public class UserService {
         user.setFriendsId(friends);
     }
 
-    public List<User> getAllFriendsUserId(Long id) {
-        User user = userStorage.findByIdUser(id);
+    public List<User> getAllFriendsUserId(Long id) { //тесты пройдены
+        User user = userRepository.findByIdUser(id);
         Set<Long> friends = user.getFriendsId();
-
-        if (user == null) {
-            throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Not found");
-        }
 
         List<User> friendUsers = new ArrayList<>();
         for (Long friendId : friends) {
-            User friendUser = userStorage.findByIdUser(friendId);
+            User friendUser = userRepository.findByIdUser(friendId);
             if (friendUser != null) {
                 friendUsers.add(friendUser);
             }
@@ -108,13 +100,10 @@ public class UserService {
         return friendUsers;
     }
 
-    public List<User> getAllCommonFriends(Long id, Long otherId) {
-        User user = userStorage.findByIdUser(id);
-        User otherUser = userStorage.findByIdUser(otherId);
+    public List<User> getAllCommonFriends(Long id, Long otherId) { //тесты пройдены
+        User user = userRepository.findByIdUser(id);
+        User otherUser = userRepository.findByIdUser(otherId);
 
-        if (user == null || otherUser == null) {
-            return Collections.emptyList(); // возвращаем пустой список, если один из пользователей не найден
-        }
         if (user.getFriendsId() == null || otherUser.getFriendsId() == null) {
             return Collections.emptyList();
         }
@@ -124,7 +113,7 @@ public class UserService {
 
         for (Long userId : userFriendsId) {
             if (otherUserFriendsId.contains(userId)) {
-                User commonFriend = userStorage.findByIdUser(userId);
+                User commonFriend = userRepository.findByIdUser(userId);
                 if (commonFriend != null) {
                     commonFriends.add(commonFriend);
                 }

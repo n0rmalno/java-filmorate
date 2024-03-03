@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,6 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 public class User {
-
     private Long id;
 
     @Email(message = "Email не корректен")
@@ -28,5 +28,7 @@ public class User {
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
-    private Set<Long> friendsId;
+
+    @JsonIgnore
+    private Set<Long> friendsId; //тесты пройдены
 }
