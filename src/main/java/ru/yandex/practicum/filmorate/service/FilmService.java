@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.FilmorateValidationException;
+import ru.yandex.practicum.filmorate.exceptions.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.FilmRepository;
+import ru.yandex.practicum.filmorate.storage.UserRepository;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -20,82 +20,87 @@ import java.util.stream.Collectors;
 @Service
 @Validated
 public class FilmService {
-    FilmStorage filmStorage;
-    UserStorage userStorage;
+    private final FilmRepository filmRepository; // тесты пройдены
+    private final UserRepository userRepository; // тесты пройдены
     private static final LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
+    public FilmService(FilmRepository filmRepository, UserRepository userRepository) {
+        this.filmRepository = filmRepository;
+        this.userRepository = userRepository;
     }
 
     public Film createFilm(Film film) {
         validate(film);
-        filmStorage.createFilm(film);
+        filmRepository.createFilm(film);
         return film;
     }
 
     public Film updateFilm(Film film) {
         validate(film);
-        filmStorage.updateFilm(film);
+        filmRepository.updateFilm(film);
         return film;
     }
 
-    public List<Film> getFilm() {
-        return filmStorage.getFilm();
+    public Film findByIdFilm(Integer id) {
+        return filmRepository.findByIdFilm(id);
     }
 
-    public Film addFilmPutsLike(Integer id, Long userId) {
-        User user = userStorage.findByIdUser(userId);
-        Film film = filmStorage.findByIdFilm(id);
+    public List<Film> getFilms() { // тесты пройдены
+        return filmRepository.getFilms();
+    } // тесты пройдены
 
-        if (user != null && film != null) {
-            Set<Long> likes = film.getLike();
-            if (likes == null) {
-                likes = new HashSet<>();
-            }
-            likes.add(user.getId());
-            film.setLike(likes);
+    public Film addFilmPutsLike(Integer id, Long userId) { //тесты пройдены
+        User user = userRepository.findByIdUser(userId);
+        Film film = filmRepository.findByIdFilm(id);
 
-            filmStorage.saveFilm(film);
-            log.info("Добавили лайк на фильм по id " + id);
-            return film;
+        Set<Integer> likes = film.getLikedUserIds();
+        if (likes == null) {
+            likes = new HashSet<>();
         }
+        likes.add(Math.toIntExact(user.getId()));
+        film.setLikedUserIds(likes);
 
-        throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Not found");
+        filmRepository.saveFilm(film);
+        log.info("Добавили лайк на фильм под id " + id);
+        return film;
     }
 
-    public void deleteFilmLike(Integer id, Long userId) {
-        User user = userStorage.findByIdUser(userId);
-        Film film = filmStorage.findByIdFilm(id);
+    public void deleteFilmLikedUserIds(Integer id, Long userId) { //тесты пройдены
+        User user;
+        Film film;
+        validationId(id, userId);
 
-        if (user == null || film == null) {
-            throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Not found");
+        try {
+            user = userRepository.findByIdUser(userId);
+            film = filmRepository.findByIdFilm(id);
+        } catch (DataNotFoundException e) {
+            log.warn("Такого id yt не может быть");
+            return;
         }
 
-        if (user != null && film != null) {
-            Set<Long> likes = film.getLike();
-            if (likes == null) {
-                return;
-            }
-            likes.remove(user.getId());
-            film.setLike(likes);
-            log.info("Удалили лайк на фильм по id " + id);
-            filmStorage.saveFilm(film);
+        Set<Integer> likes = film.getLikedUserIds();
+
+        if (likes.isEmpty()) {
+            return;
         }
+
+        likes.remove(user.getId());
+        film.setLikedUserIds(likes);
+        log.info("Удалили лайк на фильме под id " + id);
+        filmRepository.saveFilm(film);
     }
 
     public Collection<Film> getPopularFilms(Integer count) {
-        Collection<Film> filmCollection = filmStorage.getFilm();
+        Collection<Film> filmCollection = filmRepository.getFilms();
 
         if (filmCollection == null) {
             throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Not found");
         }
 
         List<Film> popularFilms = filmCollection.stream()
-                .filter(film -> (film).getLike() != null)
-                .sorted(Comparator.comparingInt(film -> ((Film) film).getLike().size()).reversed())
+                .filter(film -> (film).getLikedUserIds() != null)
+                .sorted(Comparator.comparingInt(film -> ((Film) film).getLikedUserIds().size()).reversed())
                 .limit(count)
                 .collect(Collectors.toList());
         log.info("Показали популярные фильмы");
@@ -106,8 +111,14 @@ public class FilmService {
         if (film.getReleaseDate().isBefore(START_RELEASE_DATE)) {
             log.debug("Не пройдена валидация releaseDate: {}", film.getReleaseDate());
 
-            throw new FilmorateValidationException(HttpStatus.BAD_REQUEST,
+            throw new MethodArgumentNotValidException(HttpStatus.BAD_REQUEST,
                     "Параметр ReleaseDate не должна быть не раньше даты 1895.12.28");
+        }
+    }
+
+    private void validationId(Integer id, Long userId) { //тесты пройдены
+        if (id < 0 || userId < 0) {
+            throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Not found");
         }
     }
 }
