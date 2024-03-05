@@ -6,30 +6,31 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exceptions.DataNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ErrorResponse;
 import ru.yandex.practicum.filmorate.exceptions.MethodArgumentNotValidException;
-import ru.yandex.practicum.filmorate.exceptions.ResponseEntity;
+
 
 @Slf4j
 @RestControllerAdvice
-public class ErrorHandler { //тесты пройдены
+public class ErrorHandler {
     @ExceptionHandler(DataNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public DataNotFoundException handleNotFoundException(DataNotFoundException e) {
-        log.debug("Получен статус 404 Not found: {}", e.getMessage(), e);
-        return new DataNotFoundException(HttpStatus.NOT_FOUND, e.getMessage());
+    public ErrorResponse handleNotFoundException(DataNotFoundException e) {
+        log.debug("Получен статус 404 NOT FOUND: {}", e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler(ResponseEntity.class)
+    @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity handleServerError(ResponseEntity e) {
-        log.debug("Получен статус 500 Not found: {}", e.getMessage(), e);
-        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    public ErrorResponse handleThrowable(Throwable e) {
+        log.debug("Получен статус 500 INTERNAL SERVER ERROR: {}", e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public MethodArgumentNotValidException handleValidationException(MethodArgumentNotValidException e) {
-        log.debug("Получен статус 400 Not found: {}", e.getMessage(), e);
-        return new MethodArgumentNotValidException(HttpStatus.BAD_REQUEST, e.getMessage());
+    public ErrorResponse handleValidationException(MethodArgumentNotValidException e) {
+        log.debug("Получен статус 400 BAD REQUEST: {}", e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
     }
 }

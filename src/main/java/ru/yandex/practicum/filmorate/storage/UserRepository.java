@@ -12,7 +12,7 @@ public interface UserRepository {
 
     List<User> getUsers();
 
-    void createUser(User user); //тесты пройдены
+    void createUser(User user);
 
-    void updateUser(User user); //тесты пройдены
+    void updateUser(User user);
 }

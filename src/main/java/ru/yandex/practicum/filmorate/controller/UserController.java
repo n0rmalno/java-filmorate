@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @Slf4j
-@RequiredArgsConstructor //тесты пройдены
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 

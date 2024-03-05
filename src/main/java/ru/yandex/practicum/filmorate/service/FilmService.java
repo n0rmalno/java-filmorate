@@ -13,15 +13,18 @@ import ru.yandex.practicum.filmorate.storage.FilmRepository;
 import ru.yandex.practicum.filmorate.storage.UserRepository;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @Validated
 public class FilmService {
-    private final FilmRepository filmRepository; // тесты пройдены
-    private final UserRepository userRepository; // тесты пройдены
+    private final FilmRepository filmRepository;
+    private final UserRepository userRepository;
     private static final LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     @Autowired
@@ -46,18 +49,16 @@ public class FilmService {
         return filmRepository.findByIdFilm(id);
     }
 
-    public List<Film> getFilms() { // тесты пройдены
+    public List<Film> getFilms() {
         return filmRepository.getFilms();
     } // тесты пройдены
 
-    public Film addFilmPutsLike(Integer id, Long userId) { //тесты пройдены
+    public Film addFilmPutsLike(Integer id, Long userId) {
         User user = userRepository.findByIdUser(userId);
         Film film = filmRepository.findByIdFilm(id);
 
         Set<Integer> likes = film.getLikedUserIds();
-        if (likes == null) {
-            likes = new HashSet<>();
-        }
+
         likes.add(Math.toIntExact(user.getId()));
         film.setLikedUserIds(likes);
 
@@ -66,24 +67,12 @@ public class FilmService {
         return film;
     }
 
-    public void deleteFilmLikedUserIds(Integer id, Long userId) { //тесты пройдены
-        User user;
-        Film film;
+    public void deleteFilmLikedUserIds(Integer id, Long userId) {
+        User user = userRepository.findByIdUser(userId);
+        Film film = filmRepository.findByIdFilm(id);
         validationId(id, userId);
 
-        try {
-            user = userRepository.findByIdUser(userId);
-            film = filmRepository.findByIdFilm(id);
-        } catch (DataNotFoundException e) {
-            log.warn("Такого id yt не может быть");
-            return;
-        }
-
         Set<Integer> likes = film.getLikedUserIds();
-
-        if (likes.isEmpty()) {
-            return;
-        }
 
         likes.remove(user.getId());
         film.setLikedUserIds(likes);
@@ -93,10 +82,6 @@ public class FilmService {
 
     public Collection<Film> getPopularFilms(Integer count) {
         Collection<Film> filmCollection = filmRepository.getFilms();
-
-        if (filmCollection == null) {
-            throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Not found");
-        }
 
         List<Film> popularFilms = filmCollection.stream()
                 .filter(film -> (film).getLikedUserIds() != null)
@@ -116,7 +101,7 @@ public class FilmService {
         }
     }
 
-    private void validationId(Integer id, Long userId) { //тесты пройдены
+    private void validationId(Integer id, Long userId) {
         if (id < 0 || userId < 0) {
             throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Not found");
         }

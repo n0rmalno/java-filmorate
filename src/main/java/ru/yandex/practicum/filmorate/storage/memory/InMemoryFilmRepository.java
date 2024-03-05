@@ -19,12 +19,12 @@ public class InMemoryFilmRepository implements FilmRepository {
     private final Map<Integer, Film> storage = new HashMap<>();
 
     @Override
-    public List<Film> getFilms() { //тесты пройдены
+    public List<Film> getFilms() {
         return new ArrayList<>(storage.values());
     }
 
     @Override
-    public void createFilm(Film film) { //тесты пройдены
+    public void createFilm(Film film) {
         film.setId(++generatedId);
         storage.put(film.getId(), film);
         log.info("Фильм добавлен");
@@ -36,16 +36,17 @@ public class InMemoryFilmRepository implements FilmRepository {
             storage.put(film.getId(), film);
             log.info("Film обновлен");
         } else {
-            throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Такого id нет в фильмах");
+            throw new DataNotFoundException(HttpStatus.NOT_FOUND, "Такого id:" + film.getId() + "нет в фильмах");
         }
     }
 
     @Override
-    public Film findByIdFilm(Integer id) throws DataNotFoundException {  //тесты пройдены
-        if (!storage.containsKey(id)) {
+    public Film findByIdFilm(Integer id) throws DataNotFoundException {
+        Film film = storage.get(id);
+        if (film == null) {
             throw new DataNotFoundException(HttpStatus.NOT_FOUND, "ID не может быть null");
         }
-        return storage.get(id);
+        return film;
     }
 
     @Override

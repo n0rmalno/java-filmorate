@@ -35,10 +35,9 @@ public class Film {
     @NotNull
     private LocalDate releaseDate;
 
-    @NotNull
     @Min(value = 1, message = "Продолжительность не меньше 1")
     private long duration;
 
     @JsonIgnore
-    private Set<Integer> likedUserIds = new HashSet<>(); //тесты пройдены
+    private Set<Integer> likedUserIds = new HashSet<>();
 }

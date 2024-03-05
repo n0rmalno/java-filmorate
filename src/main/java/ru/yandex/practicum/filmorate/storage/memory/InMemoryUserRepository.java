@@ -25,7 +25,7 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public void createUser(User user) { //тесты пройдены
+    public void createUser(User user) {
         generatedId++;
         user.setId(generatedId);
         storage.put(user.getId(), user);
@@ -33,7 +33,7 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public void updateUser(User user) { //тесты пройдены
+    public void updateUser(User user) {
         if (storage.containsKey(user.getId())) {
             storage.replace(user.getId(), user);
             log.info("User обновлен");
@@ -43,11 +43,12 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public User findByIdUser(Long id) throws DataNotFoundException { // тесты пройдены
-        if (!storage.containsKey(id)) {
+    public User findByIdUser(Long id) throws DataNotFoundException {
+        User user = storage.get(id);
+        if (user == null) {
             throw new DataNotFoundException(HttpStatus.NOT_FOUND, "ID не может быть null");
         }
-        return storage.get(id);
+        return user;
     }
 
     public void saveUser(User user) {

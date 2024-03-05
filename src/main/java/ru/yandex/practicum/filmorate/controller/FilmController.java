@@ -17,9 +17,9 @@ import java.util.List;
 @RequestMapping("/films")
 @Slf4j
 @Validated
-@RequiredArgsConstructor //тесты пройдены
+@RequiredArgsConstructor
 public class FilmController {
-    //    private final FilmRepository filmRepository;
+
     private final FilmService filmService;
 
     @GetMapping
@@ -65,7 +65,7 @@ public class FilmController {
 
     @GetMapping("/popular")
     public Collection<Film> getPopularListFilms(@RequestParam(value = "count", defaultValue = "10")
-                                                @Positive Integer count) { //тесты проходит
+                                                @Positive Integer count) {
         log.info("Получен запрос GET /films/popular?count={count}.");
         log.info("Попытка посмотреть популярные фильмы в кол-ве: {}", count);
         return filmService.getPopularFilms(count);
