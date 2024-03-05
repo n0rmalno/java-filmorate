@@ -46,15 +46,15 @@ public class UserService {
         User user = userRepository.findByIdUser(id);
         User userFriend = userRepository.findByIdUser(friendId);
 
-        Set<Long> friendsUser = userFriend.getFriendsId();
-        friendsUser.add(id);
-        log.info("Добавили для Юзера по id " + friendId + " друга по id " + id);
-        userRepository.saveUser(userFriend); // Сохраняем обновленные данные userFriend
-
         Set<Long> friends = user.getFriendsId();
         friends.add(friendId);
         log.info("Добавили для Юзера по id " + id + " друга по id " + friendId);
         userRepository.saveUser(user); // Сохраняем обновленные данные user
+
+        Set<Long> friendsUser = userFriend.getFriendsId();
+        friendsUser.add(id);
+        log.info("Добавили для Юзера по id " + friendId + " друга по id " + id);
+        userRepository.saveUser(userFriend); // Сохраняем обновленные данные userFriend
     }
 
     public void deleteFriend(Long id, Long friendId) {
