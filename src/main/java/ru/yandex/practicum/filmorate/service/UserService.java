@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserRepository;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +59,7 @@ public class UserService {
 
     public void deleteFriend(Long id, Long friendId) {
         User user = userRepository.findByIdUser(id);
-        Set<Long> friends = new HashSet<>(user.getFriendsId());
+        Set<Long> friends = user.getFriendsId();
         friends.remove(friendId);
         log.info("Удалили для Юзера по id " + id + " друга по id " + friendId);
     }
