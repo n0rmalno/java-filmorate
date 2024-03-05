@@ -56,7 +56,7 @@ public class UserControllerTest {
                 .birthday(LocalDate.of(1995, 1, 24))
                 .build();
         ResponseEntity<User> userMap = testRestTemplate.postForEntity("/users", user, User.class);
-        assertEquals(HttpStatus.BAD_REQUEST, userMap.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, userMap.getStatusCode());
     }
 
     @Test

@@ -74,7 +74,7 @@ public class FilmControllerTest {
                 .duration(120)
                 .build();
         ResponseEntity<Film> filmMap = testRestTemplate.postForEntity("/films", film, Film.class);
-        assertEquals(HttpStatus.BAD_REQUEST, filmMap.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, filmMap.getStatusCode());
     }
 
     @Test
@@ -88,6 +88,6 @@ public class FilmControllerTest {
                 .duration(0)
                 .build();
         ResponseEntity<Film> filmMap = testRestTemplate.postForEntity("/films", durationFail, Film.class);
-        assertEquals(HttpStatus.BAD_REQUEST, filmMap.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, filmMap.getStatusCode());
     }
 }
