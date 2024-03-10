@@ -1,27 +1,32 @@
 package ru.yandex.practicum.filmorate.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Film.
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
+@Builder
 @AllArgsConstructor
-public class Film extends BaseUnit {
+@NoArgsConstructor(force = true)
+public class Film {
 
-    @NotBlank
+    private Integer id;
+
+    @NotBlank(message = "Название не может быть пустым")
     private String name;
 
     @Size(min = 1, max = 200, message = "Не корректная длинна строки min 1, max 200")
@@ -30,7 +35,9 @@ public class Film extends BaseUnit {
     @NotNull
     private LocalDate releaseDate;
 
-    @NotNull
     @Min(value = 1, message = "Продолжительность не меньше 1")
-    private int duration;
+    private long duration;
+
+    @JsonIgnore
+    private Set<Integer> likedUserIds = new HashSet<>();
 }

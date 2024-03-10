@@ -1,72 +1,76 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class UserControllerTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class UserControllerTest {
+    @Autowired
+    private TestRestTemplate testRestTemplate;
 
-    private UserController userController;
-    private User user;
+    @Test
+    @DisplayName(value = "Запрос на проверку пройден")
+    public void createUserTest() {
+        User user = User.builder()
+                .id(1L)
+                .email("mail@yandex.ru")
+                .login("doloreUpdate")
+                .name("est adipisicing")
+                .birthday(LocalDate.of(2004, 1, 20))
+                .build();
+        ResponseEntity<User> userMap = testRestTemplate.postForEntity("/users", user, User.class);
+        assertEquals(HttpStatus.OK, userMap.getStatusCode());
+    }
 
-    @BeforeEach
-    public void setUp() {
-        userController = new UserController();
-        user = User.builder()
+    @Test
+    @DisplayName(value = "Запрос на проверку пройден, но мы вводим пользователя без id")
+    public void testUserWithoutIdRequest() {
+        User user = User.builder()
                 .email("shubaca@mail.ru")
-                .login("shubaca")
+                .login("n0rmalno")
                 .name("Alex")
-                .birthday(LocalDate.ofEpochDay(1995 - 1 - 24))
+                .birthday(LocalDate.of(1995, 1, 24))
                 .build();
-        userController.create(user);
+        ResponseEntity<User> userMap = testRestTemplate.postForEntity("/users", user, User.class);
+        assertEquals(HttpStatus.OK, userMap.getStatusCode());
     }
 
     @Test
-    public void validateUserPositive() {
-        userController.validate(user);
+    @DisplayName(value = "Запрос на не проверку пройден из-за email")
+    public void testUserMainChangedValidRequest() {
+        User user = User.builder()
+                .id(1L)
+                .email("shubacamail.ru")
+                .login("n0rmalno")
+                .name("Alex")
+                .birthday(LocalDate.of(1995, 1, 24))
+                .build();
+        ResponseEntity<User> userMap = testRestTemplate.postForEntity("/users", user, User.class);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, userMap.getStatusCode());
     }
 
     @Test
-    public void validateUserNegative() {
-        User user1 = User.builder()
+    @DisplayName(value = "Запрос на проверку пройден, но поменялось name на login")
+    public void noNameValidateTest() {
+        User noName = User.builder()
+                .id(1L)
                 .email("shubaca@mail.ru")
-                .login("shubaca")
-                .name(" ")
-                .birthday(LocalDate.ofEpochDay(1995 - 1 - 24))
+                .login("n0rmalno")
+                .name("")
+                .birthday(LocalDate.of(1995, 1, 24))
                 .build();
-        userController.validate(user1);
-        assertEquals(user1.getName(), "shubaca");
-    }
-
-    @Test
-    public void createUser() {
-        assertEquals(userController.getAll().size(), 1);
-    }
-
-    @Test
-    public void updateUser() {
-        user.setEmail("despasito@mail.ru");
-        userController.update(user);
-
-        for (User test : userController.getAll()) {
-            assertEquals(test, user);
-            assertEquals(test.getEmail(), "despasito@mail.ru");
-        }
-    }
-
-    @Test
-    public void equalityUser() {
-
-        for (User user1 : userController.getAll()) {
-            assertEquals(user1.getId(), 1);
-            assertEquals(user1.getEmail(), "shubaca@mail.ru");
-            assertEquals(user1.getLogin(), "shubaca");
-            assertEquals(user1.getName(), "Alex");
-            assertEquals(user1.getBirthday(), LocalDate.ofEpochDay(1995 - 1 - 24));
-        }
+        ResponseEntity<User> userMap = testRestTemplate.postForEntity("/users", noName, User.class);
+        User userBody = userMap.getBody();
+        assertEquals(userBody.getName(), "n0rmalno");
     }
 }

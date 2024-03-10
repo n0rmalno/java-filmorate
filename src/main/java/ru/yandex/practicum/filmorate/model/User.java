@@ -1,20 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
+@Builder
 @AllArgsConstructor
-public class User extends BaseUnit {
+public class User {
+    private Long id;
 
-    @Email
+    @Email(message = "Email не корректен")
     @NotEmpty
     private String email;
 
@@ -27,4 +27,8 @@ public class User extends BaseUnit {
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
+
+    @JsonIgnore
+    @Getter
+    private final Set<Long> friendsId = new HashSet<>(); //тесты пройдены
 }
