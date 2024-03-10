@@ -49,12 +49,10 @@ public class UserService {
         Set<Long> friends = user.getFriendsId();
         friends.add(friendId);
         log.info("Добавили для Юзера по id " + id + " друга по id " + friendId);
-        userRepository.saveUser(user); // Сохраняем обновленные данные user
 
         Set<Long> friendsUser = userFriend.getFriendsId();
         friendsUser.add(id);
         log.info("Добавили для Юзера по id " + friendId + " друга по id " + id);
-        userRepository.saveUser(userFriend); // Сохраняем обновленные данные userFriend
     }
 
     public void deleteFriend(Long id, Long friendId) {
@@ -62,6 +60,11 @@ public class UserService {
         Set<Long> friends = user.getFriendsId();
         friends.remove(friendId);
         log.info("Удалили для Юзера по id " + id + " друга по id " + friendId);
+
+        User userFriend = userRepository.findByIdUser(friendId);
+        Set<Long> friendsUser = userFriend.getFriendsId();
+        friendsUser.remove(id);
+        log.info("Удалили для Юзера по id " + friendId + " друга по id " + id);
     }
 
     public List<User> getAllFriendsUserId(Long id) {
